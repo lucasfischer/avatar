@@ -21,11 +21,13 @@ module.exports = (req, res) => {
   } else {
     height = query.size
   }
-  if (query.type === 'svg' || svgExt.test(pathname)) {
-    res.setHeader('Content-Type', 'image/svg+xml')
-    const data = image.generateSVG(pathname.replace(svgExt, ''), query.text || '', query.size, height || '')
-    return res.send(data)
+  if (query.type === 'png' || pngExt.test(pathname)){
+    res.setHeader('Content-Type', 'image/png')
+    image.generatePNG(pathname.replace(pngExt, ''), query.size, height || '').pipe(res)
+    return
   }
-  res.setHeader('Content-Type', 'image/png')
-  image.generatePNG(pathname.replace(pngExt, ''), query.size, height || '').pipe(res)
+  
+  res.setHeader('Content-Type', 'image/svg+xml')
+  const data = image.generateSVG(pathname.replace(svgExt, ''), query.text || '',query.size, height || '')
+  res.send(data)
 }
