@@ -54,5 +54,5 @@ exports.generatePNG = function(username, width, height) {
   width = parseSize(width)
   height = parseSize(height)
   const svg = generateGradient(username, '', width, height)
-  return sharp(new Buffer(svg)).png()
+  return sharp(Buffer.from(svg)).png()
 }

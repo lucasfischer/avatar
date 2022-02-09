@@ -7,13 +7,11 @@ const sizePat = /^\d+x\d+$/
 
 module.exports = (req, res) => {
   let { pathname, query } = url.parse(req.url, true)
-  if (pathname === '/favicon.ico') {
-    return ''
-  }
+  
   if (pathname === '/') {
     pathname = Math.random().toString()
   } else {
-    res.setHeader('Cache-Control', 'max-age=2592000, public')
+    res.setHeader('Cache-Control', 'max-age=2592000, public, immutable')
     res.setHeader('Last-Modified', 'Mon, 03 Jan 2011 17:45:57 GMT')
   }
   let height
@@ -25,8 +23,9 @@ module.exports = (req, res) => {
   }
   if (query.type === 'svg' || svgExt.test(pathname)) {
     res.setHeader('Content-Type', 'image/svg+xml')
-    return image.generateSVG(pathname.replace(svgExt, ''), query.text || '', query.size, height || '')
+    const data = image.generateSVG(pathname.replace(svgExt, ''), query.text || '', query.size, height || '')
+    return res.send(data)
   }
   res.setHeader('Content-Type', 'image/png')
-  return image.generatePNG(pathname.replace(pngExt, ''), query.size, height || '')
+  image.generatePNG(pathname.replace(pngExt, ''), query.size, height || '').pipe(res)
 }
